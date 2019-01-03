@@ -1,0 +1,1 @@
+option('CURL_DISABLE_LDAP', type: 'boolean', value: false, description: 'Disable LDAP support')
