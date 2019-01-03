@@ -4,6 +4,53 @@ cc = meson.get_compiler('c')
 
 lib_curl_deps = []
 
+curl_sources = [
+ 'src/slist_wc.c',
+ 'src/tool_binmode.c',
+ 'src/tool_bname.c',
+ 'src/tool_cb_dbg.c',
+ 'src/tool_cb_hdr.c',
+ 'src/tool_cb_prg.c',
+ 'src/tool_cb_rea.c',
+ 'src/tool_cb_see.c',
+ 'src/tool_cb_wrt.c',
+ 'src/tool_cfgable.c',
+ 'src/tool_convert.c',
+ 'src/tool_dirhie.c',
+ 'src/tool_doswin.c',
+ 'src/tool_easysrc.c',
+ 'src/tool_filetime.c',
+ 'src/tool_formparse.c',
+ 'src/tool_getparam.c',
+ 'src/tool_getpass.c',
+ 'src/tool_help.c',
+ 'src/tool_helpers.c',
+ 'src/tool_hugehelp.c',
+ 'src/tool_homedir.c',
+ 'src/tool_libinfo.c',
+ 'src/tool_main.c',
+ 'src/tool_metalink.c',
+ 'src/tool_msgs.c',
+ 'src/tool_operate.c',
+ 'src/tool_operhlp.c',
+ 'src/tool_panykey.c',
+ 'src/tool_paramhlp.c',
+ 'src/tool_parsecfg.c',
+ 'src/tool_setopt.c',
+ 'src/tool_sleep.c',
+ 'src/tool_strdup.c',
+ 'src/tool_urlglob.c',
+ 'src/tool_util.c',
+ 'src/tool_vms.c',
+ 'src/tool_writeout.c',
+ 'src/tool_xattr.c',
+
+ 'lib/strtoofft.c',
+ 'lib/nonblock.c',
+ 'lib/warnless.c',
+ 'lib/curl_ctype.c'
+]
+
 libcurl_sources = [
  'lib/amigaos.c',
  'lib/asyn-ares.c',
@@ -149,9 +196,6 @@ libcurl_sources = [
  ]
 
 inc = include_directories('include', 'lib')
-
-#/* Define to 1 if bool is an available type. */
-#cmakedefine HAVE_BOOL_T 1
 
 conf_data = configuration_data()
 conf_data.set('BUILDING_LIBCURL', '1')
@@ -303,9 +347,6 @@ functions = [
   ['closesocket','#include <winsock.h>','HAVE_CLOSESOCKET'],
   ['poll','#include <sys/poll.h>','HAVE_POLL_FINE'],
   ['socket','#include <sys/socket.h>','HAVE_SOCKET']
-#  ['','#include <>',''],
-#/* Define to 1 if you have the `ENGINE_load_builtin_engines' function. */
-#cmakedefine HAVE_ENGINE_LOAD_BUILTIN_ENGINES 1
 ]
 
 foreach function:functions
@@ -329,8 +370,19 @@ configure_file(output : 'curl_config.h',
                configuration : conf_data)
 
 
-lib_curl = library('curl', libcurl_sources,
+libcurl = library('curl', libcurl_sources,
                    include_directories:inc,
                    c_args:['-DBUILDING_LIBCURL', '-DHAVE_CONFIG_H'],
                    dependencies: lib_curl_deps
                    )
+
+libcurl_dep = declare_dependency(
+                                link_with:libcurl,
+                                include_directories:inc
+                                )
+
+
+curl = executable('curl', curl_sources,
+                  dependencies: libcurl_dep,
+                  c_args:['-DHAVE_CONFIG_H'],
+                )
